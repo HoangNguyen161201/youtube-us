@@ -35,3 +35,11 @@ def insert_link(url):
     cursor.execute("INSERT INTO links (url) VALUES (?)", (url,))
     conn.commit()
     conn.close()
+
+def delete_link(url):
+    conn = sqlite3.connect('mydatabase.db')
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM links WHERE url=?", (url,))
+    conn.commit()
+    conn.close()

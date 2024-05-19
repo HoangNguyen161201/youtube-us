@@ -295,9 +295,9 @@ def upload_yt(chrome_path, user_data_dir, title, description, tags, video_path, 
     time.sleep(2)
 
     WebDriverWait(browser, 10).until(
-        EC.presence_of_all_elements_located((By.CLASS_NAME, 'ytcp-button'))
+        EC.presence_of_all_elements_located((By.ID, 'toggle-button'))
     )
-    show_more_btn = browser.find_elements(By.CLASS_NAME, 'ytcp-button')[56]
+    show_more_btn = browser.find_element(By.ID, 'toggle-button')
     show_more_btn.click()
     time.sleep(2)
 

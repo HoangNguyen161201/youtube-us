@@ -9,8 +9,10 @@ from untils import generate_content, generate_to_voice, generate_image, generate
 import concurrent.futures
 from data import gif_paths, person_img_paths
 from slugify import slugify
-from db import connect_db, check_link_exists, insert_link
+from db import connect_db, check_link_exists, insert_link,delete_link
 
+# delete_link('https://www.theguardian.com/film/article/2024/may/19/german-star-at-cannes-condemns-madness-of-protective-culture-for-uk-child-actors')
+# insert_link('https://www.theguardian.com/world/article/2024/may/18/fresh-flooding-in-afghanistan-people-dead-after-heavy-rain-brings-devastation')
 
 connect_db()
 
@@ -123,8 +125,22 @@ try:
             content = generate_content(f'hay viết lại đoạn văn sau và có độ dài ký tự là {content.__len__()}: {content}')
             # generate tags
             print(f'generate tags')
-            tags = generate_content(f'hãy gợi ý 15 tags (không phải hastag nha, không ghi dính liền với nhau và không có dấu #) quan trọng để tui gắn vào video dài trên youtube để có nhiều người search. đồng thời các tag ngăn cách nhau bởi dấu phẩy như vầy tag1, tag2, tag3, .... title của video là {title}, content là {content}')
+            tags = generate_content(f'hãy gợi ý 15 tags (không phải hastag nha, không ghi dính liền với nhau, không cần sắp xếp theo số thứ tự, không có dấu #, tổng các tags không quá 290 ký tự, đồng thời các tag ngăn cách nhau bởi dấu phẩy như vầy tag1, tag2, tag3, ....) quan trọng để tui gắn vào video dài trên youtube để có nhiều người search. title của video là {title}, content là {content}')
+            
+            # Chuyển chuỗi thành list các tag
+            tag_list = tags.split(', ')
+            result = ""
+            length = 0
 
+            for tag in tag_list:
+                if length + len(tag) + 2 <= 300:  
+                    result += tag + ", "
+                    length += len(tag) + 2
+                else:
+                    break
+
+            if result.endswith(", "):
+                result = result[:-2]
 
             # generate thumbnail by ai
             print('generate thumbnail')
@@ -151,7 +167,7 @@ try:
                 file.write(f"title: {title}\n")
                 file.write(f"title slug: {title_slug}\n")
                 file.write(f"content: {content}\n")
-                file.write(f"tags: {tags}\n")
+                file.write(f"tags: {result}\n")
 
             browser.quit()
             insert_link(current_link)
@@ -161,8 +177,8 @@ try:
                 "C:/Program Files/Google/Chrome/Application/chrome.exe",
                 "C:/Path/To/Chrome/news-us",
                 title,
-                f"{title}\n\n\n(tags):\n{tags}",
-                f'{tags},',
+                f"{title}\n\n\n(tags):\n{result}",
+                f'{result},',
                 os.path.abspath(f'{path_folder}/{title_slug}.mp4'),
                 os.path.abspath(f"{path_folder}/thumbnail.jpg"),
             )
