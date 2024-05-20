@@ -10,7 +10,17 @@ def connect_db():
     conn.commit()
     conn.close()
 
+def get_all_links():
+    conn = sqlite3.connect('mydatabase.db')
+    cursor = conn.cursor()
 
+    cursor.execute("SELECT * FROM links")
+    
+    result = cursor.fetchall()
+
+    conn.close()
+
+    return result
 
 def check_link_exists(url):
     conn = sqlite3.connect('mydatabase.db')

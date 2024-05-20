@@ -9,7 +9,7 @@ from untils import generate_content, generate_to_voice, generate_image, generate
 import concurrent.futures
 from data import gif_paths, person_img_paths
 from slugify import slugify
-from db import connect_db, check_link_exists, insert_link,delete_link
+from db import connect_db, check_link_exists, insert_link,delete_link, get_all_links
 
 # delete_link('https://www.theguardian.com/film/article/2024/may/19/german-star-at-cannes-condemns-madness-of-protective-culture-for-uk-child-actors')
 # insert_link('https://www.theguardian.com/world/article/2024/may/18/fresh-flooding-in-afghanistan-people-dead-after-heavy-rain-brings-devastation')
@@ -125,8 +125,10 @@ try:
 
                 # generate title by ai
                 print('generate title')
-                print(title)
                 title = generate_content(f'hãy đặt lại title youtube cho tôi bằng tiếng anh không quá 100 ký tự: {title}')
+                if len(title) > 100:
+                   title = title[:100]
+
                 title_slug = slugify(title)
                 # generate content by ai
                 print(f'generate content {content.__len__()}')
