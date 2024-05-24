@@ -345,3 +345,4 @@ def upload_yt(chrome_path, user_data_dir, title, description, tags, video_path, 
     time.sleep(5)
     browser.quit()
     subprocess.run(['taskkill', '/f', '/im', 'chrome.exe'], check=True)
+
