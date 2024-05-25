@@ -3,7 +3,7 @@ import asyncio
 import edge_tts
 import cv2
 import requests
-from moviepy.editor import VideoFileClip, AudioFileClip, ImageClip, CompositeVideoClip, concatenate_videoclips
+from moviepy.editor import VideoFileClip, AudioFileClip, ImageClip, CompositeVideoClip, concatenate_videoclips, concatenate_audioclips
 import os
 from PIL import Image, ImageDraw, ImageFont
 from data import edge_voice_data
@@ -108,14 +108,21 @@ def concact_content_videos(audio_path, video_path_list, out_path):
     audio = AudioFileClip(audio_path)
     audio_duration = audio.duration
 
+    # intro video
+    intro = VideoFileClip('./public/intro.mp4')
+    intro_audio = AudioFileClip('./public/intro.mp4')
+    intro = intro.resize((1920, 1080))
+    intro_duration = intro.duration
+    final_duration = audio_duration + intro_duration
+
     duration_video = 0
     index = 0
-    videos = [] 
+    videos = [intro] 
 
-    while duration_video < audio_duration:
+    while duration_video < final_duration:
         video = VideoFileClip(video_path_list[index])
-        if(duration_video + video.duration > audio_duration):
-            duration_end_video =  duration_video + video.duration - audio_duration
+        if(duration_video + video.duration > final_duration):
+            duration_end_video =  duration_video + video.duration - final_duration
             video = video.subclip(0, duration_end_video)
             duration_video += duration_end_video
         else:
@@ -125,17 +132,18 @@ def concact_content_videos(audio_path, video_path_list, out_path):
             index = 0
         else:
             index += 1
+
     
 
     # Nối video lại với nhau
-    final_video = concatenate_videoclips(videos).subclip(0,audio_duration)
+    final_video = concatenate_videoclips(videos).subclip(0,audio_duration + intro_duration)
     # Ghép video và âm thanh lại với nhau
-    final_video = final_video.set_audio(audio)
+    final_video = final_video.set_audio(concatenate_audioclips([intro_audio, audio]))
 
     final_video.write_videofile(out_path)
 
     final_video.close()
-
+  
 
 def count_folders(path):
     # Kiểm tra xem đường dẫn tồn tại không
